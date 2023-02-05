@@ -78,7 +78,13 @@ def handle_message(event):
         return
 
     if working_status:
-        tts_processor.desired_text = f"{event.message.text}"
+        desired_text = event.message.text
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=f"開始合成囉，請稍等一下，我會說出來的 > < ，你說的是：{desired_text}"),
+        )
+        tts_processor.desired_text = desired_text
+
         random_num = random.randint(0, 100000)
         tts_audio_export_path = f"./audio_{random_num}.wav"
         tts_processor.generate_taiwanese_tts(
@@ -86,7 +92,15 @@ def handle_message(event):
             X_API_KEY=CHT_TTS_API_KEY,
             output_file_name=tts_audio_export_path,
         )
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=f"合成完畢，將檔案存到 {tts_audio_export_path}"),
+        )
 
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=f"將檔案轉換成 aac 格式"),
+        )
         # Trans wav to aac
         audio_duration = trans_wav_to_aac(tts_audio_export_path)
 
