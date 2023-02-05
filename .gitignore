@@ -13,3 +13,4 @@ env.bak/
 venv.bak/ 
 
 /third_party/
+/api/static/

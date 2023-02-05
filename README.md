@@ -1,5 +1,3 @@
-
-
 ### Resources
 
 - https://github.dev/howarder3/GPT-Linebot-python-flask-on-vercel
@@ -10,3 +8,6 @@
 - line audiomessage
 
   - https://github.com/Marketing-Live-in-Code/line_bot_AudioSendMessage/blob/main/app.py
+- Test webhook at local
+
+  - https://cleanshadow.blogspot.com/2017/02/ngrokline-botwebhook.html

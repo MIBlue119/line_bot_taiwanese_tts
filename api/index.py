@@ -9,6 +9,8 @@ import random
 import math
 import os
 from pathlib import Path
+import time
+
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 line_handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
@@ -20,7 +22,23 @@ app = Flask(__name__)
 tts_processor = TTS()
 
 
-def trans_wav_to_aac(file_path):
+def trans_wav_to_mp3(file_path, static_dir):
+    """Convert wav file to mp3 file
+
+    Args:
+        file_path (str): wav file path
+
+    Returns:
+        int: audio duration in seconds
+    """
+    sound = AudioSegment.from_file(file_path, format="wav")
+    file_name = Path(file_path).stem
+    aac_file_path = os.path.join(static_dir, f"{file_name}.mp3")
+    sound.export(aac_file_path, format="mp3")
+    return math.ceil(sound.duration_seconds)
+
+
+def trans_wav_to_aac(file_path, static_dir):
     """Convert wav file to aac file
 
     Args:
@@ -31,7 +49,8 @@ def trans_wav_to_aac(file_path):
     """
     sound = AudioSegment.from_file(file_path, format="wav")
     file_name = Path(file_path).stem
-    sound.export(f"./audio_{file_name}.aac", format="mp4")
+    aac_file_path = os.path.join(static_dir, f"{file_name}.aac")
+    sound.export(aac_file_path, format="mp4")
     return math.ceil(sound.duration_seconds)
 
 
@@ -62,7 +81,7 @@ def handle_message(event):
     if event.message.type != "text":
         return
 
-    if event.message.text == "合成台語":
+    if event.message.text == "台語":
         working_status = True
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text="我可以合成台語囉，歡迎來跟我互動 ^_^ ")
@@ -73,25 +92,26 @@ def handle_message(event):
         working_status = False
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="好的，我乖乖閉嘴 > <，如果想要我繼續說話，請跟我說 「說話」 > <"),
+            TextSendMessage(text="好的，我乖乖閉嘴 > <，如果想要我合成，請跟我說 「台語」 > <"),
         )
         return
 
     if working_status:
         desired_text = event.message.text
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=f"開始合成囉，請稍等一下，我會說出來的 > < ，你說的是：{desired_text}"),
-        )
+        print(f"Desired text: {desired_text}")
+
         tts_processor.desired_text = desired_text
 
-        random_num = random.randint(0, 100000)
-        tts_audio_export_path = f"./audio_{random_num}.wav"
+        random_num = time.strftime("%Y%m%d-%H%M%S")
+        static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+        os.makedirs(static_dir, exist_ok=True)
+
+        tts_audio_export_path = f"{static_dir}/audio_{random_num}.wav"
         try:
             tts_processor.generate_taiwanese_tts(
                 text=tts_processor.desired_text,
-                X_API_KEY=CHT_TTS_API_KEY,
-                output_file_name=tts_audio_export_path,
+                tts_key=CHT_TTS_API_KEY,
+                output_path=tts_audio_export_path,
             )
         except Exception as e:
             line_bot_api.reply_message(
@@ -99,25 +119,21 @@ def handle_message(event):
                 TextSendMessage(text=f"合成失敗，請稍後再試，或是聯絡我們，謝謝 > <. {e}"),
             )
             return
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=f"合成完畢，將檔案存到 {tts_audio_export_path}"),
-        )
 
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=f"將檔案轉換成 aac 格式"),
-        )
-        # Trans wav to aac
-        audio_duration = trans_wav_to_aac(tts_audio_export_path)
+        # Trans wav to mp3
 
-        line_bot_api.reply_message(
-            event.reply_token,
-            AudioSendMessage(
-                original_content_url="./audio_" + str(random_num) + ".aac",
-                duration=(audio_duration * 1000),
-            ),
+        audio_duration = trans_wav_to_mp3(tts_audio_export_path, static_dir)
+        print("Audio duration: ", audio_duration)
+
+        audio_message = AudioSendMessage(
+            original_content_url="https://f726-36-226-175-222.jp.ngrok.io"
+            + "/static/"
+            + "audio_"
+            + str(random_num)
+            + ".mp3",
+            duration=(audio_duration * 1000),
         )
+        line_bot_api.reply_message(event.reply_token, audio_message)
 
 
 if __name__ == "__main__":
