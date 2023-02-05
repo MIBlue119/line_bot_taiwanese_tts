@@ -3,7 +3,7 @@ import urllib.parse
 
 
 class TTS:
-    def __init__(self, desired_text):
+    def __init__(self, desired_text=None):
         self.desired_text = desired_text
 
     def generate_taiwanese_tts(text, X_API_KEY, output_path):
