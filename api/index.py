@@ -17,6 +17,7 @@ line_handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
 working_status = os.getenv("DEFALUT_TALKING", default="true").lower() == "true"
 
 CHT_TTS_API_KEY = os.getenv("TTS_API_KEY")
+APP_URL = os.getenv("APP_URL", default="http://localhost:5000")
 
 app = Flask(__name__)
 tts_processor = TTS()
@@ -126,7 +127,7 @@ def handle_message(event):
         print("Audio duration: ", audio_duration)
 
         audio_message = AudioSendMessage(
-            original_content_url="https://f726-36-226-175-222.jp.ngrok.io"
+            original_content_url=APP_URL
             + "/static/"
             + "audio_"
             + str(random_num)
