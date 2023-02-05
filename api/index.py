@@ -87,11 +87,18 @@ def handle_message(event):
 
         random_num = random.randint(0, 100000)
         tts_audio_export_path = f"./audio_{random_num}.wav"
-        tts_processor.generate_taiwanese_tts(
-            text=tts_processor.desired_text,
-            X_API_KEY=CHT_TTS_API_KEY,
-            output_file_name=tts_audio_export_path,
-        )
+        try:
+            tts_processor.generate_taiwanese_tts(
+                text=tts_processor.desired_text,
+                X_API_KEY=CHT_TTS_API_KEY,
+                output_file_name=tts_audio_export_path,
+            )
+        except Exception as e:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=f"合成失敗，請稍後再試，或是聯絡我們，謝謝 > <. {e}"),
+            )
+            return
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=f"合成完畢，將檔案存到 {tts_audio_export_path}"),
