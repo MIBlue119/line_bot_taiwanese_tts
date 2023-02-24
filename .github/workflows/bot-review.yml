@@ -1,0 +1,26 @@
+name: Code review bot
+
+on:
+  pull_request:
+    types: [opened, edited, reopened]
+
+jobs:
+  code_review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+      - name: Install dependencies
+        run: |
+          pip install -r https://raw.githubusercontent.com/MIBlue119/bot_reviewer/main/requirements.txt
+      - name: Run code review bot
+        run: |
+          python https://raw.githubusercontent.com/MIBlue119/bot_reviewer/main/bot.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: MIBlue119/line_bot_taiwanese_tts
