@@ -19,7 +19,9 @@ jobs:
           pip install -r https://raw.githubusercontent.com/MIBlue119/bot_reviewer/main/requirements.txt
       - name: Run code review bot
         run: |
-          python https://raw.githubusercontent.com/MIBlue119/bot_reviewer/main/bot.py
+          python https://raw.githubusercontent.com/MIBlue119/bot_reviewer/blob/main/bot.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
 
