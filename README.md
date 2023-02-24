@@ -6,10 +6,10 @@
 - Connect the app with Line bot
 - Use [ngrok](https://ngrok.com/) to put localhost api with https
 
-### Installation 
+### Installation
 
 - construct python environment
-- install dependencies with `pip install -r requirements.txt` 
+- install dependencies with `pip install -r requirements.txt`
 
 ### Usage
 
@@ -47,6 +47,8 @@
 
    - example: `https://f726-39-226-175-899.jp.ngrok.io`/webhook
      - verify the url to get success message
+
+Note: Chunghwa Telecom may close the API.
 
 ### Resources
 
