@@ -22,5 +22,4 @@ jobs:
           python https://raw.githubusercontent.com/MIBlue119/bot_reviewer/main/bot.py
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: MIBlue119/line_bot_taiwanese_tts
+
